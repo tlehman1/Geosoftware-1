@@ -61,7 +61,7 @@ distanceToCity.sort(sort2nd);
 
 
 //hier wird der Text der in der HTML ausgegeben wird konfiguriert.
-var output = ""
+var output = "";
 for(var i = 0; i < distanceToCity.length; i++) {
     output = output + distanceToCity[i][0] + " is " +  distanceToCity[i][1] + " km away from Münster." + "<br />";
 }
