@@ -9,4 +9,4 @@ Die Funktionen sind zu kommentieren, und zusa ̈tzlich mit Zeilen- kommentaren z
 ..................................................................
 Da die U ̈bungen ha ̈ufig auf den Ergebnissen der vorherigen aufbau- en, ist es empfohlen den Code auf eine Weise anzufertigen in der er sich in spa ̈teren Versionen leicht a ̈ndern oder weiterverwenden la ̈sst!
 Erstellt bitte bei Fragen oder Unklarheiten einen Forenpost im Learn- web so dass diese dort, und gegebenenfalls in der darauf folgenden Sit- zung, beantwortet werden ko ̈nnen.
-Kreative Lo ̈sungsansa ̈tze und Codeschnipsel ko ̈nnen nominiert wer- den in einer kurzen Pra ̈sentation von den Verfassern vorgestellt zu wer- den. Durch die Vorstellung wird Schokolade gewonnen
+Kreative Lo ̈sungsansa ̈tze und Codeschnipsel ko ̈nnen nominiert wer- den in einer kurzen Pra ̈sentation von den Verfassern vorgestellt zu wer- den. Durch die Vorstellung wird Schokolade gewonnen.
