@@ -1,6 +1,7 @@
 "use strict"
 
-var distanceToCity = [
+// Variable distanceToCity erstellt ein 2-dim-Array welches mit den Namen der Städte und den jeweiligen Distanzen gefüllt wurde.
+var distanceToCity = [ 
     ["Köln", 0.0],
     ["Amsterdam", 0.0],
     ["Kassel", 0.0],
@@ -14,16 +15,19 @@ var distanceToCity = [
     ["Oslo", 0.0]
   ];
 
-  
+
+// Hier wurde die Funktion calculateDistance erstellt.
 function calculateDistance(){
 
     for(var i = 0; i < cities.length; i++){
-
+        
+        // hier werden die zur Verfügung gestellten cities.js und point.js der unten stehenden Code angepasst.
         var lat1 = point[1]; 
         var lon1 = point[0];
         var lat2 = cities[i][1];
         var lon2 = cities[i][0];
-    
+        
+        // folgender Code wurde von der Website https://www.movable-type.co.uk/scripts/latlong.html kopiert, welche in der Aufgabenstellung stand.
         const R = 6371e3; // metres
         const φ1 = lat1 * Math.PI/180; // φ, λ in radians
         const φ2 = lat2 * Math.PI/180;
@@ -34,28 +38,30 @@ function calculateDistance(){
           Math.cos(φ1) * Math.cos(φ2) *
           Math.sin(Δλ/2) * Math.sin(Δλ/2);
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        // bis hierhin wurde der Code kopiert
 
-        var d = (R * c)/1000;
-        var d = (Math.round(d));
+        var d = (R * c)/1000; // hier wird die berechnete Distanz in km umgerechnet.
+        var d = (Math.round(d)); // hier wird die Distanz gerundet.
 
-        distanceToCity[i][1] = d;
+        distanceToCity[i][1] = d; // hier wird die hintere Stelle im 2-dim-Array angepasst.
 
     }
 }
 
-function zweiteSpalteSortieren (a, b){
+//folgender Code wurde hier gefunden: https://developer.mozilla.org/en-US/docs/web/javascript/reference/global_objects/array/sort
+function sort2nd (a, b){
     return a[1] - b[1];
 }
 
+//Funktion wird ausgeführt.
 calculateDistance();
-// Array citiesDistance aufsteigend sortieren
-//Quelle: https://developer.mozilla.org/en-US/docs/web/javascript/reference/global_objects/array/sort
-distanceToCity.sort(zweiteSpalteSortieren);
-// Funktion für zweite Spalte sortieren 
-//gibt entweder -1, 0 oder 1 zurück und sort() tauscht dann die beiden ausgewählten Spalten
+
+//Array wird sortiert.
+distanceToCity.sort(sort2nd);
 
 
+//hier wird der Text der in der HTML ausgegeben wird konfiguriert.
 var output = "";
 for(var i = 0; i < distanceToCity.length; i++) {
-    output = output + distanceToCity[i][0] + " ist " +  distanceToCity[i][1] + " km von Münster entfernt" + "<br />";
+    output = output + distanceToCity[i][0] + " is " +  distanceToCity[i][1] + " km away from Münster." + "<br />";
 }
