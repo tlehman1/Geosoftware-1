@@ -21,5 +21,5 @@ Bonuspunkte: Eigene Ideen fu ̈r zusa ̈tzliche Features sind gerne ge- sehen. D
 Externe Libraries sind noch nicht erlaubt Die Aufgabe soll in Ein- zelarbeit bearbeitet werden.
 Erstellt bitte bei Fragen oder Unklarheiten einen Forenpost im Learn- web so dass diese dort, und gegebenenfalls in der darauf folgenden Sit- zung, beantwortet werden ko ̈nnen.
 Kreative Lo ̈sungsansa ̈tze und Codeschnipsel werden nominiert um in einer 5-minu ̈tigen Pra ̈sentation von den Verfassern vorgestellt zu werden. Durch die Vorstellung wird Schokolade gewonnen.
-viel Erfolg.
+viel Erfolg
 
