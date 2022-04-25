@@ -1,0 +1,21 @@
+h1 {
+    font-family: Arial;
+    font-size: 30px;
+    color: black;
+    text-align: center;
+ }
+
+ p {
+     font-family: Arial;
+     font-size: 20px;
+     color: black;
+ }
+
+ body {
+     text-align:center;
+}
+
+#currentLocation {
+    width: 30%;
+    height: 13px;
+}

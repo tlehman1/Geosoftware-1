@@ -1,20 +1,53 @@
 <!DOCTYPE html>
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="ID=edge">
-    <meta name = "viewport" content = "width=device-width", initial-scale = "1.0">
-    <script src="point.js"></script> <!--einladen von point.js-->
-    <script src="cities.js"></script> <!--einladen von cities.js-->
-    <script src="DistanceCalculator.js"></script> <!--einladen von DistanceCalculator-->
-    <title>Aufgabe 1 von Tim</title>
-    <link rel="stylesheet" href="stylesheet.css">  <!--einladen von Stylesheet-->
+    <meta name="viewport" content="width=device-width" , initial-scale="1.0">
+    <script src="point.js"></script>
+    <!--<script src="DistanceCalculator.js"></script>-->
+
+    <title>Aufgabe 2 von Tim</title>
+    <link rel="stylesheet" href="stylesheet.css">
 </head>
+
 <body>
-    <h1>Calculated Distances</h1> <!--Überschrift-->
+    <h1>Calculated Distances</h1>
+
     <br>
-    <p>In this table you can see the distance from Münster to all other cities.</p> <!--Text-->
-    <p>The distances are sorted from nearest to furthest.</p> <!--Text-->
-    <p id="output" ></p> <!--Ausgabe für Website-->
-    <script>document.getElementById("output").innerHTML = output</script>
+    <button onclick="getLocation()">get current location</button>
+
+    <p id="Location"></p>
+
+
+    <div>
+        <textarea type="text" id="currentLocation"></textarea>
+        <input type="submit" value="upload" />
+    </div>
+
+    <script>
+        var x = document.getElementById("currentLocation");
+
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.watchPosition(showPositionInInput);
+            } else {
+                x.innerHTML = "Geolocation is not supported by this browser.";
+            }
+        }
+
+        function showPositionInInput(position) {
+            let currentLocation = new Array(position.coords.longitude, position.coords.latitude)
+            currentLocation = new JSONConstructor(currentLocation, "Point")
+            document.getElementById("currentLocation").innerHTML = JSON.stringify(currentLocation)
+        }
+
+        function JSONConstructor(array, type) {
+            this.type = type
+            this.coordinates = array
+        }
+    </script>
+
 </body>
+
 </html>
