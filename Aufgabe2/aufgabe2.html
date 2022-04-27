@@ -8,18 +8,17 @@
     <script src="poi.js"></script>
     <script src="DistanceCalculator.js"></script>
 
+
     <title>Aufgabe 2 von Tim</title>
     <link rel="stylesheet" href="stylesheet.css">
 </head>
 
 <body>
-    <h1>Calculated Distances</h1>
+    <h1>The Distance Calculator</h1>
 
     <br>
     <button onclick="getLocation()">get current location</button>
     <p id="Location"></p>
-    
-    
 
     <div>
         <textarea type="text" id="currentLocation"></textarea> <br />
@@ -27,10 +26,11 @@
     </div>
 
     <button onclick="showCalculatedTable()">set and calculate</button>
-
+    <p id="output" ></p> <!--Ausgabe für Website-->
+    
     <script>
-        function showTable() {
-                
+        function showCalculatedTable() {
+            calculatePoint();
         }
     </script>
     <script>
@@ -54,12 +54,60 @@
             this.type = type
             this.coordinates = array
         }
-
-    
-       
     </script>
-    
-    
+
+    <!--Luca Code-->
+    <script>
+        function calculatePoint() {
+
+            let JSON_input = document.getElementById("currentLocation")
+
+            // testing 
+            console.log(JSON_input);
+
+            // Here I check, whether the input is viable as a JSON/GeoJSON object
+            if (isJsonString(JSON_input.value)) {
+
+                // Here I check, whether the GeoJSON is a point, because only than i can calculate properly
+                if (JSON.parse(JSON_input.value).type == "Point") {
+
+                    point = JSON.parse(document.getElementById("currentLocation").value);
+                    console.log(point)
+                    distanceCalculator(point);
+                } else {
+
+                    // Error!
+                    alert("WRONG INPUT! PLEASE TRY AGAIN");
+
+                }
+
+            } else {
+
+                // Error!
+                alert("WRONG INPUT! PLEASE TRY AGAIN");
+
+            }
+
+
+        }
+
+        function isJsonString(str) {
+
+            try {
+
+                JSON.parse(str);
+
+            } catch (e) {
+
+                return false;
+
+            }
+
+            return true;
+
+        }
+    </script>
+
 </body>
 
 </html>
