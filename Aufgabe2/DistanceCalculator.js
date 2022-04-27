@@ -25,15 +25,18 @@ var poiDistance = new Array(poi.features.length);
 document.title = "Welcome to the Distance Calculator";
 alert(document.title);
 
-// Funktion von distance Calculator welcher die Daten aus dem neuen Punkt verarbeitet und als neuen lat1 und lon1 speichert.
-// angepasst aus Aufgabe 1
-function distanceCalculator(newPoint) {
+
+/**
+ *  @function distanceCalculator
+ *  @description Berechnung von den Distanzen, wie bereits aus Aufgabe1 bekannt
+ */
+function distanceCalculator(currentPoint) {
 
     for (var i = 0; i < poi.features.length; i++) {
 
         // Coordinaten von dem neuen Punkt und aus der poi.js werden definiert.
-        var lat1 = newPoint.coordinates[1];
-        var lon1 = newPoint.coordinates[0];
+        var lat1 = currentPoint.coordinates[1];
+        var lon1 = currentPoint.coordinates[0];
         var lat2 = poi.features[i].geometry.coordinates[1];
         var lon2 = poi.features[i].geometry.coordinates[0];
 
