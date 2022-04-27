@@ -2,14 +2,16 @@
 
 var poiDistance = new Array(poi.features.length);
 
+document.title = "Welcome to the Distance Calculator";
+alert(document.title);
 
-function distanceCalculator() {
+function distanceCalculator(newPoint) {
 
     for (var i = 0; i < poi.features.length; i++) {
 
         // hier werden die zur Verfügung gestellten poi.js und point.js der unten stehenden Code angepasst.
-        var lat1 = point[1];
-        var lon1 = point[0];
+        var lat1 = newPoint.coordinates[1];
+        var lon1 = newPoint.coordinates[0];
         var lat2 = poi.features[i].geometry.coordinates[1];
         var lon2 = poi.features[i].geometry.coordinates[0];
 
@@ -26,26 +28,21 @@ function distanceCalculator() {
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         // bis hierhin wurde der Code kopiert
 
-        var d = (R * c); 
-        var d = (Math.round(d)); 
+        var d = (R * c);
+        var d = (Math.round(d));
 
         poiDistance[i] = d;
+
+
     }
-}
+    poiDistance.sort(function (a, b) {
+        return a - b;
+    })
 
 
-
-//Funktion wird ausgeführt.
-distanceCalculator();
-
-poiDistance.sort(function (a, b){
-    return a - b;
-})
-
-//Array wird sortiert.
-//poiDistance.sort();
-
-var output = "";
-for (var i = 0; i < poiDistance.length; i++) {
-    output = output + poiDistance[i] + " m" + "<br />";
+    var output = "";
+    for (var i = 0; i < poiDistance.length; i++) {
+        output = output + poiDistance[i] + " m" + "<br />";
+    }
+    document.getElementById("output").innerHTML = output;
 }
