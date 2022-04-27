@@ -8,7 +8,6 @@
     <script src="poi.js"></script>
     <script src="DistanceCalculator.js"></script>
 
-
     <title>Aufgabe 2 von Tim</title>
     <link rel="stylesheet" href="stylesheet.css">
 </head>
@@ -17,25 +16,38 @@
     <h1>The Distance Calculator</h1>
 
     <br>
-    <button onclick="getLocation()">get current location</button>
+    <button onclick="getLocation()">get current location</button> <!-- Definierter Button, der die aktuelle Position in das Textfeld schreibt-->
     <p id="Location"></p>
 
     <div>
-        <textarea type="text" id="currentLocation"></textarea> <br />
-        <!--<input type="submit" value="set and calculate" />-->
+        <textarea type="text" id="currentLocation"></textarea> <br /> <!-- besagtes Textfeld, in dem man die Koordinaten angezeigt bekommt und die Koordinaten auch verändern kann-->
     </div>
 
-    <button onclick="showCalculatedTable()">set and calculate</button>
-    <p id="output" ></p> <!--Ausgabe für Website-->
-    
+    <button onclick="showCalculatedTable()">set and calculate</button> <!-- Dieser Button verwendet den Text aus dem Textfeld und berechnet dann die Distanz zum Punkt im Textfeld-->
+
+    <p id="output"></p> 
+
     <script>
+        /**
+        * @author Tim Lehmann
+        * @descrpition Ich hatte Probleme mit den Funktionen, also wenn ich die in die DistanceCalculator.js geschrieben habe, haben die nicht mehr funktioniert.
+        * Deswegen stehen die hier.
+        */
+
+        /**
+         * @function showCalculatedTable
+         * @description Ausführen der CalculatePoint Funktion und die Anzeige der Tabelle
+         */
         function showCalculatedTable() {
             calculatePoint();
         }
-    </script>
-    <script>
-        var x = document.getElementById("currentLocation");
 
+        var x = document.getElementById("currentLocation");
+        
+        /**
+         * @function getLocation
+         * @description Vorgegeben aus der VL
+         */
         function getLocation() {
             if (navigator.geolocation) {
                 navigator.geolocation.watchPosition(showPositionInInput);
@@ -43,7 +55,11 @@
                 x.innerHTML = "Geolocation is not supported by this browser.";
             }
         }
-
+        
+        /**
+         * @function showPositionInInput and JSONConstructor
+         * @description Hilfe von Jonathan Mader
+         */
         function showPositionInInput(position) {
             let currentLocation = new Array(position.coords.longitude, position.coords.latitude)
             currentLocation = new JSONConstructor(currentLocation, "Point")
@@ -54,57 +70,55 @@
             this.type = type
             this.coordinates = array
         }
-    </script>
+        /**
+         * bis hier hin
+         */
 
-    <!--Luca Code-->
-    <script>
+        
+        /**
+         * @function calculatePoint
+         * @description Kontrolliert ob der richtige Input gegeben ist, wenn nicht gibts eine Fehlermeldung.
+         * außerdem kontrolliert die Funktion, ob der Input als Punkt gegeben ist, dann wird der Punkt für die weiteren Funktionen vorbereitet.
+         */
         function calculatePoint() {
 
             let JSON_input = document.getElementById("currentLocation")
 
-            // testing 
-            console.log(JSON_input);
-
-            // Here I check, whether the input is viable as a JSON/GeoJSON object
             if (isJsonString(JSON_input.value)) {
 
-                // Here I check, whether the GeoJSON is a point, because only than i can calculate properly
                 if (JSON.parse(JSON_input.value).type == "Point") {
 
                     point = JSON.parse(document.getElementById("currentLocation").value);
-                    console.log(point)
                     distanceCalculator(point);
                 } else {
 
-                    // Error!
-                    alert("WRONG INPUT! PLEASE TRY AGAIN");
+                    alert("Error! Wrong Input.");
 
                 }
 
             } else {
 
-                // Error!
-                alert("WRONG INPUT! PLEASE TRY AGAIN");
+                alert("Error! Wrong Input.");
 
             }
 
 
         }
 
+        /**
+         * @function isJsonString
+         * @param (str)
+         * @description Überprüfung ob String ein JSON String ist, falls ja kommt true zurück falls nicht dann false.
+         * Quelle: https://stackoverflow.com/questions/3710204/how-to-check-if-a-string-is-a-valid-json-string
+         */
         function isJsonString(str) {
 
             try {
-
                 JSON.parse(str);
-
             } catch (e) {
-
                 return false;
-
             }
-
             return true;
-
         }
     </script>
 
