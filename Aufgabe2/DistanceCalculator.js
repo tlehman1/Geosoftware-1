@@ -1,21 +1,43 @@
 "use strict"
+/**
+ * @author Tim Lehmann
+ * @descrpition JavaScript Document for Aufgabe 2
+ */
 
+// Erstellung der Metadaten mit Hilfe von:
+// https://stackoverflow.com/questions/18982228/how-to-add-meta-tag-in-javascript
+ var meta = document.createElement('meta');
+ meta.author = "author";
+ meta.content = "Tim Lehmann";
+ document.head.appendChild(meta);
+
+ var meta = document.createElement('meta');
+ meta.keywords = "keywords";
+ meta.content = "Calculator, HTML, Javascript, Programming"
+ document.head.appendChild(meta);
+
+// Erstellung von einem neuen Array, welches die Länge der Punkte in der poi.js hat.
 var poiDistance = new Array(poi.features.length);
 
+
+// Der Titel wird mit einer DOM- Manipulation geändert und mit einem Alert angekündigt.
+// https://developer.mozilla.org/de/docs/Web/API/Document/title
 document.title = "Welcome to the Distance Calculator";
 alert(document.title);
 
+// Funktion von distance Calculator welcher die Daten aus dem neuen Punkt verarbeitet und als neuen lat1 und lon1 speichert.
+// angepasst aus Aufgabe 1
 function distanceCalculator(newPoint) {
 
     for (var i = 0; i < poi.features.length; i++) {
 
-        // hier werden die zur Verfügung gestellten poi.js und point.js der unten stehenden Code angepasst.
+        // Coordinaten von dem neuen Punkt und aus der poi.js werden definiert.
         var lat1 = newPoint.coordinates[1];
         var lon1 = newPoint.coordinates[0];
         var lat2 = poi.features[i].geometry.coordinates[1];
         var lon2 = poi.features[i].geometry.coordinates[0];
 
-        // folgender Code wurde von der Website https://www.movable-type.co.uk/scripts/latlong.html kopiert, welche in der Aufgabenstellung stand.
+        // folgender Code wurde von der Website https://www.movable-type.co.uk/scripts/latlong.html kopiert, welche in der Aufgabenstellung stand (Aufgabe1).
         const R = 6371e3; // metres
         const φ1 = lat1 * Math.PI / 180; // φ, λ in radians
         const φ2 = lat2 * Math.PI / 180;
@@ -26,20 +48,17 @@ function distanceCalculator(newPoint) {
             Math.cos(φ1) * Math.cos(φ2) *
             Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        // bis hierhin wurde der Code kopiert
 
         var d = (R * c);
         var d = (Math.round(d));
 
         poiDistance[i] = d;
-
-
     }
-    poiDistance.sort(function (a, b) {
-        return a - b;
-    })
+    // Arrow Funktion:
+    // angepasste Sort Funktion aus Aufgabe 1
+    poiDistance.sort((a, b) => a - b)
 
-
+    // Output Message auf der Website
     var output = "";
     for (var i = 0; i < poiDistance.length; i++) {
         output = output + poiDistance[i] + " m" + "<br />";
