@@ -5,6 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="ID=edge">
     <meta name="viewport" content="width=device-width" , initial-scale="1.0">
     <script src="point.js"></script>
+    <script src="poi.js"></script>
     <script src="DistanceCalculator.js"></script>
 
     <title>Aufgabe 2 von Tim</title>
@@ -16,15 +17,22 @@
 
     <br>
     <button onclick="getLocation()">get current location</button>
-
     <p id="Location"></p>
-
+    
+    
 
     <div>
-        <textarea type="text" id="currentLocation"></textarea>
-        <input type="submit" value="upload" />
+        <textarea type="text" id="currentLocation"></textarea> <br />
+        <!--<input type="submit" value="set and calculate" />-->
     </div>
 
+    <button onclick="showCalculatedTable()">set and calculate</button>
+
+    <script>
+        function showTable() {
+                
+        }
+    </script>
     <script>
         var x = document.getElementById("currentLocation");
 
@@ -46,8 +54,12 @@
             this.type = type
             this.coordinates = array
         }
-    </script>
 
+    
+       
+    </script>
+    
+    
 </body>
 
 </html>
