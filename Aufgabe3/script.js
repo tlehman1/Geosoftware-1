@@ -1,17 +1,18 @@
-/**
-* Musterlösung zu Aufgabe 2, Geosoft 1, SoSe 2022
-* @author {Name der studierenden Person}   matr.Nr.: {Matrikelnummer}
-*/
+/**abfahrten
+ * Musterlösung zu Aufgabe 2, Geosoft 1, SoSe 2022
+ * @author {Tim Lehmann}   matr.Nr.: {503417}
+ */
 
 "use strict";
 
 //declaration of global variables
-var pointcloud;
+var pointcloud = [];
 var point;
+var abfahrten;
 
 /**
-* @function onLoad function that is executed when the page is loaded
-*/
+ * @function onLoad function that is executed when the page is loaded
+ */
 function onLoad() {
   //event listener
   document.getElementById("refreshBtn").addEventListener("click",
@@ -29,58 +30,27 @@ function onLoad() {
       }
     }
   );
-  document.getElementById("getHaltestellenBtn").addEventListener("click", getData);
-
-  //daten vorbereiten und main ausführen
-  pois = JSON.parse(pois);
-  main(point, pointcloud);
+  busstops.haltestellen();
 }
 
 //##############################################################################
 //## FUNCTIONS
 //##############################################################################
 
-const sendHttpRequest = (method, url, data) => {
-    const xhr = new XMLHttpRequest();
-    xhr.open(method, url);
-
-    xhr.responseType = 'json';
-
-    xhr.onload = () => {
-      if (xhr.status >= 400) {
-        reject(xhr.response);
-      } else {
-        (xhr.response);
-      }
-    };
-
-    xhr.onerror = () => {
-      reject('Something went wrong!');
-    };
-
-    xhr.send(JSON.stringify(data));
-}
-
-const getData = () => {
-  sendHttpRequest('GET', 'https://rest.busradar.conterra.de/prod/haltestellen').then(responseData => {
-    console.log(responseData);
-  });
-};
-
-
 /**
-* @function main the main function
-*/
+ * @function the main function
+ */
 function main(point, pointcloud) {
   //sortiere Daten nach distanz und mach damit eine Tabelle auf der HTML
-  let results = sortByDistance(point, pois);
+  let results = sortByDistance(point, pointcloud);
   drawTable(results);
+  busstops.abfahrten(results[0].id, 600);
 }
 
 /**
-* @function refresh
-* @desc is called when new coordinates are inserted. refreshes the data on the site
-*/
+ * @function refresh
+ * @desc is called when new coordinates are inserted. refreshes the data on the site
+ */
 function refresh() {
   let positionGeoJSON = document.getElementById("userPosition").value;
 
@@ -101,20 +71,83 @@ function refresh() {
     } else {
       alert("invalid input.please input a single valid point in a feature collection");
     }
-  }
-  catch (error) {
+  } catch (error) {
     console.log(error);
     alert("invalid input. see console for more info.");
   }
 }
 
+/** 
+ * This class contains all methods that are used to communicate and get the data from the given API 
+ * and a constructor for creating objects
+ * @class
+ */
+class BusRadarAPI {
+  constructor() {
+    this.xhr = new XMLHttpRequest();
+  };
+
+
+  /**
+   * haltestellen
+   * @public
+   * @desc fills the pointcloud array with the response data from the api and calls the main method with it
+   */
+  haltestellen() {
+    this.xhr.open('GET', 'https://rest.busradar.conterra.de/prod/haltestellen');
+    this.xhr.responseType = 'json'
+    this.xhr.onload = () => {
+      pointcloud = this.xhr.response;
+      main(point, pointcloud);
+    }
+    this.xhr.send();
+  }
+  /**
+   * abfahrten
+   * @public
+   * @desc gets the nearest bus stop by the id and then gets the time of depature for it
+   * @param identifier busstop id for nearest bus stop
+   * @param time in seconds
+   */
+   abfahrten(identifier, time) {
+    let x = new XMLHttpRequest();
+    let resource = `https://rest.busradar.conterra.de/prod/haltestellen/${identifier}/abfahrten?sekunden=`;
+    resource += time;
+
+    x.open("GET", resource);
+    x.onload = () => {
+      drawDepatureTable(abfahrten);
+      }
+    x.onreadystatechange = () => {
+      if (x.status == "200" && x.readyState == 4) {
+        abfahrten = JSON.parse(x.responseText);
+      }
+    }
+    x.send();
+  }
+}
 /**
-* @function sortByDistance
-* @desc takes a point and an array of points and sorts them by distance ascending
-* @param point array of [lon, lat] coordinates
-* @param pointArray array of points to compare to
-* @returns Array with JSON Objects, which contain coordinate and distance
-*/
+   * timeConverter
+   * @desc converts the given time in seconds (hh:mm:ss)
+   * @source https://stackoverflow.com/questions/6312993/javascript-seconds-to-time-string-with-format-hhmmss
+   * @param seconds time in seconds
+   */
+ function timeConverter(timeinseconds) {
+  var miliseconds = timeinseconds * 1000 + (60000*120); 
+  var date = new Date(miliseconds)
+  var convertedtime = date.toISOString().slice(11, -8);
+
+  return convertedtime;
+}
+
+var busstops = new BusRadarAPI();
+/**
+ * @function sortByDistance
+ * @desc takes a point and an array of points and sorts them by distance ascending
+ * @param point array of [lon, lat] coordinates
+ * @param pointArray array of points to compare to
+ * @returns Array with JSON Objects, which contain coordinate and distance
+ */
 function sortByDistance(point, pointArray) {
   let output = [];
 
@@ -126,9 +159,11 @@ function sortByDistance(point, pointArray) {
       j++;
     }
     let newPoint = {
+      name: pointArray.features[i].properties.lbez,
       coordinates: pointArray.features[i].geometry.coordinates,
-      distance: distance,
-      name: pointArray.features[i].properties.name
+      distance: Math.round(distance),
+      richtung: pointArray.features[i].properties.richtung,
+      id: pointArray.features[i].properties.nr,
     };
     output.splice(j, 0, newPoint);
   }
@@ -137,12 +172,12 @@ function sortByDistance(point, pointArray) {
 }
 
 /**
-* @function twoPointDistance
-* @desc takes two geographic points and returns the distance between them. Uses the Haversine formula (http://www.movable-type.co.uk/scripts/latlong.html, https://stackoverflow.com/questions/27928/calculate-distance-between-two-latitude-longitude-points-haversine-formula)
-* @param start array of [lon, lat] coordinates
-* @param end array of [lon, lat] coordinates
-* @returns the distance between 2 points on the surface of a sphere with earth's radius
-*/
+ * @function twoPointDistance
+ * @desc takes two geographic points and returns the distance between them. Uses the Haversine formula (http://www.movable-type.co.uk/scripts/latlong.html, https://stackoverflow.com/questions/27928/calculate-distance-between-two-latitude-longitude-points-haversine-formula)
+ * @param start array of [lon, lat] coordinates
+ * @param end array of [lon, lat] coordinates
+ * @returns the distance between 2 points on the surface of a sphere with earth's radius
+ */
 function twoPointDistance(start, end) {
   //variable declarations
   var earthRadius; //the earth radius in meters
@@ -170,14 +205,14 @@ function twoPointDistance(start, end) {
 }
 
 /**
-* @function validGeoJSONPoint
-* @desc funtion that validates the input GeoJSON so it's only a point
-* @param geoJSON the input JSON that is to be validated
-* @returns boolean true if okay, false if not
-*/
+ * @function validGeoJSONPoint
+ * @desc funtion that validates the input GeoJSON so it's only a point
+ * @param geoJSON the input JSON that is to be validated
+ * @returns boolean true if okay, false if not
+ */
 function validGeoJSONPoint(geoJSON) {
-  if (geoJSON.features.length == 1
-    && geoJSON.features[0].geometry.type.toUpperCase() == "POINT"
+  if (geoJSON.features.length == 1 &&
+    geoJSON.features[0].geometry.type.toUpperCase() == "POINT"
   ) {
     return true;
   } else {
@@ -186,20 +221,20 @@ function validGeoJSONPoint(geoJSON) {
 }
 
 /**
-* @function toRadians
-* @desc helping function, takes degrees and converts them to radians
-* @returns a radian value
-*/
+ * @function toRadians
+ * @desc helping function, takes degrees and converts them to radians
+ * @returns a radian value
+ */
 function toRadians(degrees) {
   var pi = Math.PI;
   return degrees * (pi / 180);
 }
 
 /**
-* @function toDegrees
-* @desc helping function, takes radians and converts them to degrees
-* @returns a degree value
-*/
+ * @function toDegrees
+ * @desc helping function, takes radians and converts them to degrees
+ * @returns a degree value
+ */
 function toDegrees(radians) {
   var pi = Math.PI;
   return radians * (180 / pi);
@@ -213,28 +248,57 @@ function toDegrees(radians) {
 function drawTable(results) {
   var table = document.getElementById("resultTable");
   //creates the Table with the direction an distances
+  for (var j = 0; j < 20; j++) {
+    var newRow = table.insertRow(j + 1);
+    var cel1 = newRow.insertCell(0);
+    var cel2 = newRow.insertCell(1);
+    var cel3 = newRow.insertCell(2);
+    var cel4 = newRow.insertCell(3);
+    cel1.innerHTML = results[j].name;
+    cel2.innerHTML = results[j].coordinates;
+    cel3.innerHTML = results[j].richtung;
+    cel4.innerHTML = results[j].distance;
+  }
+}
+/**
+   * drawDepatureTable
+   * @desc draws the table for the nearest bus stop containg the linienid as number
+   * the direction as end stop and the actual depature time with date and time as YY:MM:DD:T:hh:mm:ss GMT
+   * @param {*} results array of JSON with contains
+   */
+ function drawDepatureTable(results) {
+  var table = document.getElementById("depatureTable");
   for (var j = 0; j < results.length; j++) {
     var newRow = table.insertRow(j + 1);
     var cel1 = newRow.insertCell(0);
     var cel2 = newRow.insertCell(1);
     var cel3 = newRow.insertCell(2);
-    cel1.innerHTML = results[j].coordinates;
-    cel2.innerHTML = results[j].name;
-    cel3.innerHTML = results[j].distance;
+    cel1.innerHTML = results[j].linienid;
+    cel2.innerHTML = results[j].richtungstext;
+    cel3.innerHTML = timeConverter(results[j].abfahrtszeit);
   }
 }
-
 /**
-* @function arrayToGeoJSON
-* @desc function that converts a given array of points into a geoJSON feature collection.
-* @param inputArray Array that is to be converted
-* @returns JSON of a geoJSON feature collectio
-*/
+ * @function arrayToGeoJSON
+ * @desc function that converts a given array of points into a geoJSON feature collection.
+ * @param inputArray Array that is to be converted
+ * @returns JSON of a geoJSON feature collectio
+ */
 function arrayToGeoJSON(inputArray) {
   //"Skeleton" of a valid geoJSON Feature collection
-  let outJSON = { "type": "FeatureCollection", "features": [] };
+  let outJSON = {
+    "type": "FeatureCollection",
+    "features": []
+  };
   //skelly of a (point)feature
-  let pointFeature = { "type": "Feature", "properties": {}, "geometry": { "type": "Point", "coordinates": [] } };
+  let pointFeature = {
+    "type": "Feature",
+    "properties": {},
+    "geometry": {
+      "type": "Point",
+      "coordinates": []
+    }
+  };
 
   //turn all the points in the array into proper features and append
   for (const element of inputArray) {
@@ -254,9 +318,19 @@ function arrayToGeoJSON(inputArray) {
 function showPosition(position) {
   var x = document.getElementById("userPosition");
   //"Skeleton" of a valid geoJSON Feature collection
-  let outJSON = { "type": "FeatureCollection", "features": [] };
+  let outJSON = {
+    "type": "FeatureCollection",
+    "features": []
+  };
   //skelly of a (point)feature
-  let pointFeature = {"type": "Feature","properties": {},"geometry": {"type": "Point","coordinates": []}};
+  let pointFeature = {
+    "type": "Feature",
+    "properties": {},
+    "geometry": {
+      "type": "Point",
+      "coordinates": []
+    }
+  };
   pointFeature.geometry.coordinates = [position.coords.longitude, position.coords.latitude];
   //add the coordinates to the geoJson
   outJSON.features.push(pointFeature);
