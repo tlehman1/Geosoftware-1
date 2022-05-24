@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>GeoSoftware1 Assignment 3</title>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" type="text/css" href="style.css">
+
+
+</head>
+<body onload="onLoad()">
+  <script src="point.js"></script>
+  <script src="script.js"></script>
+
+  <div class="a" align="center">
+  <h1>GeoSoftware1 Assignment 3</h1>
+
+  <div>
+  	assignment: 03
+  	course: Geosoftware I SoSe 2022 <br>
+  	author: Tim Lehmann<br> <br>
+
+    In das Textfeld wird als Standardreferenzwert das Geo1 Gebäude verwendet. <br>
+    Optional kann auch der User Standort als Referenzwert eingefügt werden.
+    <hr>
+
+    current position geojson: <br>
+    <textarea style="width: 50%; height: 50px;" id="userPosition"></textarea><br>
+    <button id="refreshBtn" class="button" type="button">refresh</button>
+    <button id="getLocationBtn" class="button" type="button">get user location</button>
+  </div>
+
+  <br>
+
+  <div id="geoJSON" class="script" align="center">
+  </div>
+
+  <br>
+  <p>Depatures in the next ten minutes from the nearest bus stop:</p>
+  <table style="width:75%" align="center" id="depatureTable">
+    <tr>
+      <th>Busline</th>
+      <th>Last stop</th>
+      <th>Time of departure</th>
+    </tr>
+  </table>
+  <br>
+  <p>Nearest bus stops in ascending order sorted by distance:</p>
+  <table style="width:75%" align="center" id="resultTable">
+    <tr>
+      <th>Name of bus stop</td>
+      <th>coordinates</td>
+      <th>direction</td>
+      <th>distance in m</td>
+    </tr>
+  </table>
+
+  </div>
+</body>
+</html>
