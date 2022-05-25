@@ -27,3 +27,7 @@ table, th, td {
  	font-family: Consolas;
 }
 
+#mapid {
+  height: 400px;
+  width: auto;
+}
