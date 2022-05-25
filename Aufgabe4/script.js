@@ -25,6 +25,7 @@ function onLoad() {
       var x = document.getElementById("userPosition");
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(showPosition);
+        navigator.geolocation.getCurrentPosition(userPositionMarking);
       } else {
         x.innerHTML = "Geolocation is not supported by this browser.";
       }
@@ -43,8 +44,9 @@ function onLoad() {
 function main(point, pointcloud) {
   //sortiere Daten nach distanz und mach damit eine Tabelle auf der HTML
   let results = sortByDistance(point, pointcloud);
+  clearTable('depatureTable');
   drawTable(results);
-  busstops.abfahrten(results[0].id, 600);
+  busstops.abfahrten(results[0].id, 3600);
 }
 
 /**
@@ -83,24 +85,17 @@ function refresh() {
  * @class
  */
 class BusRadarAPI {
-  constructor() {
-    this.xhr = new XMLHttpRequest();
-  };
-
-
   /**
    * haltestellen
    * @public
    * @desc fills the pointcloud array with the response data from the api and calls the main method with it
    */
-  haltestellen() {
-    this.xhr.open('GET', 'https://rest.busradar.conterra.de/prod/haltestellen');
-    this.xhr.responseType = 'json'
-    this.xhr.onload = () => {
-      pointcloud = this.xhr.response;
-      main(point, pointcloud);
-    }
-    this.xhr.send();
+  async haltestellen() {
+    const API_URL = "https://rest.busradar.conterra.de/prod";
+    const response = await fetch(API_URL + '/haltestellen');
+    const data = await response.json();
+    pointcloud = data;
+    main(point, pointcloud);
   }
   /**
    * abfahrten
@@ -109,31 +104,25 @@ class BusRadarAPI {
    * @param identifier busstop id for nearest bus stop
    * @param time in seconds
    */
-   abfahrten(identifier, time) {
-    let x = new XMLHttpRequest();
+  async abfahrten(identifier, time) {
     let resource = `https://rest.busradar.conterra.de/prod/haltestellen/${identifier}/abfahrten?sekunden=`;
     resource += time;
 
-    x.open("GET", resource);
-    x.onload = () => {
-      drawDepatureTable(abfahrten);
-      }
-    x.onreadystatechange = () => {
-      if (x.status == "200" && x.readyState == 4) {
-        abfahrten = JSON.parse(x.responseText);
-      }
-    }
-    x.send();
+    const response = await fetch(resource);
+    const data = await response.json();
+    abfahrten = data;
+
+    drawDepatureTable(abfahrten);
   }
 }
 /**
-   * timeConverter
-   * @desc converts the given time in seconds (hh:mm:ss)
-   * @source https://stackoverflow.com/questions/6312993/javascript-seconds-to-time-string-with-format-hhmmss
-   * @param seconds time in seconds
-   */
- function timeConverter(timeinseconds) {
-  var miliseconds = timeinseconds * 1000 + (60000*120); 
+ * timeConverter
+ * @desc converts the given time in seconds (hh:mm:ss)
+ * @source https://stackoverflow.com/questions/6312993/javascript-seconds-to-time-string-with-format-hhmmss
+ * @param seconds time in seconds
+ */
+function timeConverter(timeinseconds) {
+  var miliseconds = timeinseconds * 1000 + (60000 * 120);
   var date = new Date(miliseconds)
   var convertedtime = date.toISOString().slice(11, -8);
 
@@ -241,6 +230,21 @@ function toDegrees(radians) {
 }
 
 /**
+ * function clearTable
+ * @desc removes all table entries and rows except for the header.
+ * @param tableID the id of the table to clear
+ */
+function clearTable(tableID) {
+  //remove all table rows
+  var tableHeaderRowCount = 1;
+  var table = document.getElementById(tableID);
+  var rowCount = table.rows.length;
+  for (var i = tableHeaderRowCount; i < rowCount; i++) {
+    table.deleteRow(tableHeaderRowCount);
+  }
+}
+
+/**
  * @function drawTable
  * @desc inserts the calculated data into the table that's displayed on the page
  * @param {*} results array of JSON with contains
@@ -261,12 +265,12 @@ function drawTable(results) {
   }
 }
 /**
-   * drawDepatureTable
-   * @desc draws the table for the nearest bus stop containg the linienid as number
-   * the direction as end stop and the actual depature time with date and time as YY:MM:DD:T:hh:mm:ss GMT
-   * @param {*} results array of JSON with contains
-   */
- function drawDepatureTable(results) {
+ * drawDepatureTable
+ * @desc draws the table for the nearest bus stop containg the linienid as number
+ * the direction as end stop and the actual depature time with date and time as YY:MM:DD:T:hh:mm:ss GMT
+ * @param {*} results array of JSON with contains
+ */
+function drawDepatureTable(results) {
   var table = document.getElementById("depatureTable");
   for (var j = 0; j < results.length; j++) {
     var newRow = table.insertRow(j + 1);
@@ -336,3 +340,87 @@ function showPosition(position) {
   outJSON.features.push(pointFeature);
   x.innerHTML = JSON.stringify(outJSON);
 }
+
+var map = L.map('mapid').setView([51.961, 7.618], 12);
+L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+  attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(map);
+
+// styling for the icon for the user position
+var standortIcon = L.icon({
+  iconUrl: 'RotePinnadel.png',
+  iconSize: [25, 25], // size of the icon
+  iconAnchor: [0, 0], // point of the icon which will correspond to marker's location
+  popupAnchor: [13, 0] // point from which the popup should open relative to the iconAnchor
+});
+
+// styling for the icon for the bus station
+var bushaltestelleIcon = L.icon({
+  iconUrl: 'Bushaltestelle.png',
+  iconSize: [25, 25], // size of the icon
+  iconAnchor: [0, 0], // point of the icon which will correspond to marker's location
+  popupAnchor: [13, 0] // point from which the popup should open relative to the iconAnchor
+});
+
+/**
+ * userPositionMarking
+ * @desc shows user position on the map with a marker and popup
+ * @param position user position from getLocation() 
+ * @return coordinates as text in pop up
+ */
+function userPositionMarking(position) {
+  var lat = position.coords.latitude;
+  var lng = position.coords.longitude;
+  var marker = L.marker([lat, lng], {
+    icon: standortIcon
+  }).addTo(map);
+  marker.bindPopup("User position: " + lat + " " + lng);
+  marker.openPopup();;
+  map.setView([lat, lng], 16);
+}
+
+var drawnItems = new L.FeatureGroup()
+var drawControl = new L.Control.Draw({
+  draw: {
+    polygon: false,
+    marker: false,
+    circle: false,
+    polyline: false,
+    circlemarker: false
+  },
+  edit: {
+    featureGroup: drawnItems
+  }
+})
+
+
+map.addLayer(drawnItems)
+map.addControl(drawControl)
+
+var polygon = [];
+map.on(L.Draw.Event.CREATED, (e) => {
+  var type = e.layerType;
+  var layer = e.layer;
+  polygon = layer.toGeoJSON().geometry.coordinates;
+  drawnItems.addLayer(layer);
+  map.addLayer(layer);
+
+  var haltestellenImPolygon = sortByDistance(point, pointcloud);
+  for (var i = 0; i < haltestellenImPolygon.length; i++) {
+
+    var poly = turf.polygon(polygon);
+    var pt = turf.point(haltestellenImPolygon[i].coordinates);
+
+    // checking if the coodinates from the bus stops from the array are inside the drawn polygon with turf.booleanPointInPolygon
+    turf.booleanPointInPolygon(pt, poly)
+    if (turf.booleanPointInPolygon(pt, poly) == true) {
+      let marker = new L.marker([haltestellenImPolygon[i].coordinates[1], haltestellenImPolygon[i].coordinates[0]], {
+        icon: bushaltestelleIcon
+      }).addTo(map);
+
+      marker.bindPopup("Name of bus stop: " + haltestellenImPolygon[i].name + "<br> coordinates: " + haltestellenImPolygon[i].coordinates +
+        " <br> direction: " + haltestellenImPolygon[i].richtung + "<br> distance: " + haltestellenImPolygon[i].distance + " m")
+
+    }
+  }
+})
