@@ -1,0 +1,25 @@
+h1 {
+    font-family: Arial;
+    font-size: 30px;
+    color: black;
+    text-align: center;
+ }
+
+ p {
+     font-family: Arial;
+     font-size: 20px;
+     color: black;
+ }
+
+ body {
+     text-align:center;
+     background-image: url("background.jpeg");
+     background-repeat: no-repeat;
+     background-size: cover;
+
+}
+
+#currentLocation {
+    width: 30%;
+    height: 20px;
+}

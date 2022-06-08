@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="ID=edge">
+    <meta name="viewport" content="width=device-width" , initial-scale="1.0">
+    <script src="2/point.js"></script>
+    <script src="2/poi.js"></script>
+    <script src="2/DistanceCalculator.js"></script>
+
+    <title>Aufgabe 2 von Tim</title>
+    
+
+    <!--Bootstrap stylesheet -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <!--jQuery library -->
+    <script src="https://code.jquery.com/jquery-3.6.0.js"
+        integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+
+    <!-- Bootstrap libary -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous">
+    </script>
+    <link rel="stylesheet" href="2/stylesheet.css">
+</head>
+
+<body>
+    <div class="card-header">
+
+
+        <nav class="navbar navbar-expand-lg navbar-light">
+
+
+            <a class="navbar-brand" href="#" white>
+                Geosoftware 1</a>
+
+
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar"
+                aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbar">
+
+                <!-- Links -->
+                <div class="navbar-nav">
+                    <a class="nav-item nav-link" href="index2.html">
+                        Assignment 2
+
+                    </a>
+                    <a class="nav-item nav-link" href="index4.html">
+                        Assignment 4
+
+                    </a>
+                    <a class="nav-item nav-link" href="start.html">
+                        Homepage
+
+                    </a>
+                    <a class="nav-item nav-link" href="https://www.instagram.com/timlehmann29/" target="_blank">
+                        Instagram
+
+                    </a>
+                    <a class="nav-item nav-link" href="https://onlyfans.com/haleybrooks18">
+                        mein Onlyfans
+
+                    </a>
+
+                </div>
+            </div>
+        </nav>
+    </div>
+
+    <h1>The Distance Calculator</h1>
+
+    <br>
+    <button onclick="getLocation()">get current location</button> <!-- Definierter Button, der die aktuelle Position in das Textfeld schreibt-->
+    <p id="Location"></p>
+
+    <div>
+        <textarea type="text" id="currentLocation"></textarea> <br /> <!-- besagtes Textfeld, in dem man die Koordinaten angezeigt bekommt und die Koordinaten auch verändern kann-->
+    </div>
+
+    <button onclick="showCalculatedTable()">set and calculate</button> <!-- Dieser Button verwendet den Text aus dem Textfeld und berechnet dann die Distanz zum Punkt im Textfeld-->
+
+    <p id="output"></p> 
+
+    <script>
+        /**
+        * @author Tim Lehmann
+        * @descrpition Ich hatte Probleme mit den Funktionen, also wenn ich die in die DistanceCalculator.js geschrieben habe, haben die nicht mehr funktioniert.
+        * Deswegen stehen die hier.
+        */
+
+        /**
+         * @function showCalculatedTable
+         * @description Ausführen der CalculatePoint Funktion und die Anzeige der Tabelle
+         */
+        function showCalculatedTable() {
+            calculatePoint();
+        }
+
+        var x = document.getElementById("currentLocation");
+        
+        /**
+         * @function getLocation
+         * @description Vorgegeben aus der VL
+         */
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.watchPosition(showPositionInInput);
+            } else {
+                x.innerHTML = "Geolocation is not supported by this browser.";
+            }
+        }
+        
+        /**
+         * @function showPositionInInput and JSONConstructor
+         * @description Hilfe von Jonathan Mader
+         */
+        function showPositionInInput(position) {
+            let currentLocation = new Array(position.coords.longitude, position.coords.latitude)
+            currentLocation = new JSONConstructor(currentLocation, "Point")
+            document.getElementById("currentLocation").innerHTML = JSON.stringify(currentLocation)
+        }
+
+        function JSONConstructor(array, type) {
+            this.type = type
+            this.coordinates = array
+        }
+        /**
+         * bis hier hin
+         */
+
+        
+        /**
+         * @function calculatePoint
+         * @description Kontrolliert ob der richtige Input gegeben ist, wenn nicht gibts eine Fehlermeldung.
+         * außerdem kontrolliert die Funktion, ob der Input als Punkt gegeben ist, dann wird der Punkt für die weiteren Funktionen vorbereitet.
+         */
+        function calculatePoint() {
+
+            let JSON_input = document.getElementById("currentLocation")
+
+            if (isJsonString(JSON_input.value)) {
+
+                if (JSON.parse(JSON_input.value).type == "Point") {
+
+                    point = JSON.parse(document.getElementById("currentLocation").value);
+                    distanceCalculator(point);
+                } else {
+
+                    alert("Error! Wrong Input.");
+
+                }
+
+            } else {
+
+                alert("Error! Wrong Input.");
+
+            }
+
+
+        }
+
+        /**
+         * @function isJsonString
+         * @param (str)
+         * @description Überprüfung ob String ein JSON String ist, falls ja kommt true zurück falls nicht dann false.
+         * Quelle: https://stackoverflow.com/questions/3710204/how-to-check-if-a-string-is-a-valid-json-string
+         */
+        function isJsonString(str) {
+
+            try {
+                JSON.parse(str);
+            } catch (e) {
+                return false;
+            }
+            return true;
+        }
+    </script>
+<div class="card-footer">
+    <a href="start.html">Startpage</a>
+</div>
+</body>
+
+</html>
